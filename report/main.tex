@@ -1,0 +1,400 @@
+\documentclass[11pt,a4paper]{article}
+
+% ============================================================================
+% PACKAGES
+% ============================================================================
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{graphicx}
+\graphicspath{{figures/}}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{tabularx}
+\usepackage{multirow}
+\usepackage{amsmath,amssymb}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{cleveref}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{float}
+\usepackage{enumitem}
+\usepackage{parskip}
+\usepackage{natbib}
+
+% ============================================================================
+% CONFIGURATION
+% ============================================================================
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=magenta,
+    urlcolor=cyan,
+    citecolor=blue
+}
+
+\lstset{
+    language=Python,
+    basicstyle=\ttfamily\small,
+    keywordstyle=\color{blue}\bfseries,
+    stringstyle=\color{red},
+    commentstyle=\color{gray}\itshape,
+    numbers=left,
+    numberstyle=\tiny\color{gray},
+    stepnumber=1,
+    numbersep=8pt,
+    backgroundcolor=\color{gray!10},
+    frame=single,
+    rulecolor=\color{gray!50},
+    breaklines=true,
+    breakatwhitespace=true,
+    tabsize=4,
+    showstringspaces=false
+}
+
+% ============================================================================
+% DOCUMENT INFO
+% ============================================================================
+\title{%
+    \textbf{Comparative Study of Metaheuristic Optimization Libraries:}\\
+    \Large{PyMOO vs Optuna}
+}
+
+\author{
+    Metaheuristic Algorithms Course\\
+    Master's Program in Computer Science\\
+    West University of Timișoara\\
+    2025-2026 Academic Year
+}
+
+\date{January 2026}
+
+% ============================================================================
+% DOCUMENT
+% ============================================================================
+\begin{document}
+
+\maketitle
+
+% ----------------------------------------------------------------------------
+% ABSTRACT
+% ----------------------------------------------------------------------------
+\begin{abstract}
+This report presents a comparative study of two popular Python libraries for metaheuristic optimization: PyMOO and Optuna. We evaluate both libraries using standard benchmark functions (Sphere, Rastrigin, Ackley, and Rosenbrock) with three optimization algorithms: Genetic Algorithm (GA), Differential Evolution (DE), and Particle Swarm Optimization (PSO) for PyMOO, and their Optuna equivalents---TPE, CMA-ES, and NSGA-II samplers. Our analysis covers solution quality, convergence behavior, execution time, and API usability. Results indicate that PyMOO consistently achieves better solution quality across all benchmark problems, while Optuna offers faster execution times but at the cost of optimization precision. This comparative analysis provides guidance for researchers and practitioners in selecting the appropriate optimization framework based on their specific requirements.
+\end{abstract}
+
+% ----------------------------------------------------------------------------
+% INTRODUCTION
+% ----------------------------------------------------------------------------
+\section{Introduction}
+\label{sec:introduction}
+
+Metaheuristic optimization algorithms have become essential tools in computational intelligence and operations research for solving complex optimization problems where traditional gradient-based methods fail or are impractical \citep{blum2003metaheuristics}. These algorithms are particularly valuable for problems characterized by non-convexity, discontinuity, multimodality, or the absence of analytical gradient information \citep{yang2020nature}.
+
+The proliferation of optimization libraries in Python has significantly lowered the barrier to entry for researchers and practitioners. However, selecting the appropriate tool for a given problem can be challenging due to the diverse design philosophies, algorithmic implementations, and intended use cases of different libraries \citep{custodio2021recent}.
+
+This study focuses on two prominent Python optimization libraries:
+
+\textbf{PyMOO} \citep{blank2020pymoo} is a multi-objective optimization framework designed for research and production environments. It provides well-established evolutionary algorithms with a modular architecture that allows easy customization and extension. PyMOO emphasizes algorithm transparency and is widely used in academic research.
+
+\textbf{Optuna} \citep{akiba2019optuna} is a hyperparameter optimization framework that has gained significant traction in the machine learning community. While originally designed for hyperparameter tuning, its flexible sampler-based architecture makes it applicable to general black-box optimization problems.
+
+The primary objectives of this comparative study are:
+\begin{enumerate}
+    \item To evaluate solution quality achieved by both libraries on standard benchmark functions
+    \item To analyze convergence behavior and computational efficiency
+    \item To assess API usability and ease of integration
+    \item To provide recommendations for library selection based on problem characteristics
+\end{enumerate}
+
+% ----------------------------------------------------------------------------
+% METHODS
+% ----------------------------------------------------------------------------
+\section{Methods}
+\label{sec:methods}
+
+\subsection{Library Overview}
+
+\subsubsection{PyMOO: Multi-Objective Optimization in Python}
+
+PyMOO is a comprehensive optimization library that provides implementations of well-established evolutionary algorithms \citep{blank2020pymoo}. The library is built on a modular architecture that separates problems, algorithms, operators, and termination criteria into distinct components. Key features include:
+
+\begin{itemize}
+    \item Support for both single-objective and multi-objective optimization
+    \item Implementation of standard algorithms: GA, DE, PSO, NSGA-II, NSGA-III
+    \item Customizable operators for selection, crossover, and mutation
+    \item Built-in constraint handling mechanisms
+    \item Extensive documentation and benchmarking capabilities
+\end{itemize}
+
+\subsubsection{Optuna: Hyperparameter Optimization Framework}
+
+Optuna is designed as a define-by-run optimization framework, where the search space is dynamically constructed during optimization \citep{akiba2019optuna}. This paradigm offers flexibility but differs fundamentally from traditional evolutionary algorithms. Key features include:
+
+\begin{itemize}
+    \item Multiple sampler implementations: TPE, CMA-ES, NSGA-II, Random, Grid
+    \item Efficient pruning strategies for early stopping
+    \item Database-backed distributed optimization
+    \item Integration with machine learning frameworks
+    \item Visualization and analysis tools
+\end{itemize}
+
+\subsection{Algorithms Compared}
+
+To ensure a fair comparison, we mapped equivalent algorithms between the two libraries:
+
+\begin{table}[H]
+\centering
+\caption{Algorithm Mapping Between Libraries}
+\label{tab:algorithm_mapping}
+\begin{tabular}{lll}
+\toprule
+\textbf{Category} & \textbf{PyMOO} & \textbf{Optuna} \\
+\midrule
+Population-based Search & GA (Genetic Algorithm) & TPE (Tree-structured Parzen Estimator) \\
+Adaptive Strategy & DE (Differential Evolution) & CMA-ES (Covariance Matrix Adaptation) \\
+Swarm Intelligence & PSO (Particle Swarm Optimization) & NSGA-II Sampler \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Genetic Algorithm (GA)} is a population-based search method inspired by natural selection \citep{holland1992genetic}. The algorithm maintains a population of candidate solutions that evolve through selection, crossover, and mutation operators.
+
+\textbf{Differential Evolution (DE)} is an evolutionary algorithm that uses vector differences for generating trial solutions \citep{storn1997differential}. DE is known for its simplicity and effectiveness on continuous optimization problems.
+
+\textbf{Particle Swarm Optimization (PSO)} is a swarm intelligence algorithm inspired by social behavior of bird flocking \citep{kennedy1995particle}. Particles adjust their positions based on personal and global best solutions.
+
+\textbf{Tree-structured Parzen Estimator (TPE)} is a sequential model-based optimization algorithm that models the objective function using kernel density estimators \citep{bergstra2011algorithms}.
+
+\textbf{CMA-ES} (Covariance Matrix Adaptation Evolution Strategy) adapts the covariance matrix of a multivariate normal distribution to efficiently sample the search space \citep{hansen2016cma}.
+
+\subsection{Benchmark Problems}
+
+We selected four standard benchmark functions that represent different optimization challenges:
+
+\subsubsection{Sphere Function}
+The Sphere function is a simple unimodal, convex function often used as a baseline:
+\begin{equation}
+f(\mathbf{x}) = \sum_{i=1}^{n} x_i^2
+\end{equation}
+Search domain: $[-5.12, 5.12]^n$, Global minimum: $f(\mathbf{0}) = 0$
+
+\subsubsection{Rastrigin Function}
+The Rastrigin function is highly multimodal with regularly distributed local minima \citep{rastrigin1974systems}:
+\begin{equation}
+f(\mathbf{x}) = 10n + \sum_{i=1}^{n} \left[x_i^2 - 10\cos(2\pi x_i)\right]
+\end{equation}
+Search domain: $[-5.12, 5.12]^n$, Global minimum: $f(\mathbf{0}) = 0$
+
+\subsubsection{Ackley Function}
+The Ackley function has a nearly flat outer region with a large hole at the center \citep{ackley1987connectionist}:
+\begin{equation}
+f(\mathbf{x}) = -20\exp\left(-0.2\sqrt{\frac{1}{n}\sum_{i=1}^{n}x_i^2}\right) - \exp\left(\frac{1}{n}\sum_{i=1}^{n}\cos(2\pi x_i)\right) + 20 + e
+\end{equation}
+Search domain: $[-32.768, 32.768]^n$, Global minimum: $f(\mathbf{0}) = 0$
+
+\subsubsection{Rosenbrock Function}
+The Rosenbrock function features a narrow, curved valley that is difficult to navigate \citep{rosenbrock1960automatic}:
+\begin{equation}
+f(\mathbf{x}) = \sum_{i=1}^{n-1} \left[100(x_{i+1} - x_i^2)^2 + (1-x_i)^2\right]
+\end{equation}
+Search domain: $[-5, 10]^n$, Global minimum: $f(\mathbf{1}) = 0$
+
+\subsection{Experimental Setup}
+
+All experiments were conducted with the following parameters:
+\begin{itemize}
+    \item \textbf{Population size}: 50
+    \item \textbf{Number of generations/trials}: 50
+    \item \textbf{Problem dimensionality}: 10
+    \item \textbf{Number of independent runs}: 5 (for statistical significance)
+\end{itemize}
+
+The implementation was developed in Python 3.11 using PyMOO version 0.6.x and Optuna version 3.x. All experiments were executed on a standard desktop environment, and results include mean, standard deviation, and minimum fitness values across all runs.
+
+% ----------------------------------------------------------------------------
+% RESULTS
+% ----------------------------------------------------------------------------
+\section{Results}
+\label{sec:results}
+
+\subsection{Solution Quality Comparison}
+
+\Cref{tab:results} presents the detailed comparison of optimization results across all problem-algorithm combinations. PyMOO consistently achieved better solution quality (lower fitness values) compared to Optuna across all benchmark functions and algorithms.
+
+\input{figures/results_table}
+
+\subsubsection{Sphere Function Results}
+On the Sphere function, PyMOO demonstrated superior performance with PSO achieving the best result ($5.12 \times 10^{-6}$), followed by GA ($5.78 \times 10^{-4}$). In contrast, Optuna's best result was $6.47$ (CMA-ES), representing a difference of several orders of magnitude.
+
+\subsubsection{Rastrigin Function Results}
+The Rastrigin function posed significant challenges for both libraries due to its multimodal nature. PyMOO's GA achieved $0.53$, while PSO reached $9.58$. Optuna struggled considerably, with TPE achieving $100.33$ and NSGA-II reaching $99.97$.
+
+\subsubsection{Ackley Function Results}
+For the Ackley function, PyMOO's PSO achieved $0.012$, followed by GA at $0.21$. Optuna's samplers produced significantly higher values, with CMA-ES at $14.69$ and TPE at $18.07$.
+
+\subsubsection{Rosenbrock Function Results}
+The valley-shaped Rosenbrock function showed similar trends. PyMOO's GA achieved $22.24$ and PSO reached $27.79$, while Optuna's TPE produced $28,164.31$ and NSGA-II reached $97,724.88$.
+
+\subsection{Convergence Analysis}
+
+The convergence behavior was analyzed through convergence curves recorded during optimization. \Cref{fig:convergence} shows representative convergence curves for the Sphere and Rastrigin functions.
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{convergence_sphere_ga}
+        \caption{Sphere - GA/TPE}
+        \label{fig:conv_sphere_ga}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{convergence_sphere_pso}
+        \caption{Sphere - PSO/NSGA-II}
+        \label{fig:conv_sphere_pso}
+    \end{subfigure}
+    
+    \vspace{0.5cm}
+    
+    \begin{subfigure}[b]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{convergence_rastrigin_ga}
+        \caption{Rastrigin - GA/TPE}
+        \label{fig:conv_rastrigin_ga}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{convergence_rastrigin_pso}
+        \caption{Rastrigin - PSO/NSGA-II}
+        \label{fig:conv_rastrigin_pso}
+    \end{subfigure}
+    \caption{Convergence curves comparing PyMOO and Optuna algorithms}
+    \label{fig:convergence}
+\end{figure}
+
+PyMOO algorithms showed smoother and more consistent convergence patterns, while Optuna's samplers exhibited more erratic behavior typical of sequential model-based optimization.
+
+\subsection{Execution Time Comparison}
+
+\Cref{fig:time_comparison} presents the execution time comparison. Optuna demonstrated faster execution times (approximately 0.03--0.09 seconds) compared to PyMOO (0.10--0.14 seconds). However, this speed advantage came at the cost of solution quality.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\textwidth]{time_comparison}
+    \caption{Execution time comparison between PyMOO and Optuna}
+    \label{fig:time_comparison}
+\end{figure}
+
+\subsection{Overall Performance Comparison}
+
+\Cref{fig:overall_comparison} provides a summary visualization of the overall performance comparison across all benchmark functions.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{comparison_bars}
+    \caption{Bar chart comparison of best fitness values across all problems and algorithms}
+    \label{fig:overall_comparison}
+\end{figure}
+
+\subsection{API Usability Assessment}
+
+Beyond numerical performance, we assessed the usability and design philosophy of both libraries:
+
+\textbf{PyMOO Strengths:}
+\begin{itemize}
+    \item Clear separation of problem definition and algorithm configuration
+    \item Extensive documentation with academic rigor
+    \item Native support for multi-objective optimization
+    \item Built-in visualization and benchmarking tools
+    \item Reproducible results with seed control
+\end{itemize}
+
+\textbf{Optuna Strengths:}
+\begin{itemize}
+    \item Define-by-run paradigm offers flexibility
+    \item Excellent integration with ML frameworks (PyTorch, TensorFlow)
+    \item Built-in distributed optimization capabilities
+    \item Pruning strategies for expensive objective functions
+    \item Active development and community support
+\end{itemize}
+
+% ----------------------------------------------------------------------------
+% DISCUSSION
+% ----------------------------------------------------------------------------
+\section{Discussion}
+\label{sec:discussion}
+
+The experimental results reveal fundamental differences in the design philosophy and intended use cases of PyMOO and Optuna.
+
+\subsection{Performance Analysis}
+
+PyMOO's superior solution quality can be attributed to its true population-based evolutionary approach. The algorithms maintain and evolve a population of solutions, enabling effective exploration of the search space through genetic operators. This approach is well-suited for continuous optimization problems where the objective function landscape has complex structures.
+
+Optuna's samplers, while algorithmically sophisticated, are designed for hyperparameter optimization scenarios where:
+\begin{enumerate}
+    \item The objective function is expensive to evaluate
+    \item The search space may be mixed (continuous, categorical, conditional)
+    \item Early stopping through pruning is beneficial
+\end{enumerate}
+
+For the benchmark functions used in this study, these design assumptions led to suboptimal performance compared to dedicated evolutionary algorithms.
+
+\subsection{Algorithm Mapping Considerations}
+
+The algorithm mapping between libraries (see \Cref{tab:algorithm_mapping}) represents functional equivalents rather than identical implementations. TPE is not a genetic algorithm but a sequential model-based method that shares some population-based characteristics. Similarly, using NSGA-II as a PSO equivalent is an approximation, as NSGA-II is inherently designed for multi-objective optimization.
+
+\subsection{Practical Recommendations}
+
+Based on our findings, we provide the following recommendations:
+
+\begin{itemize}
+    \item \textbf{For continuous benchmark optimization}: PyMOO is the preferred choice due to its superior solution quality and algorithm transparency.
+    \item \textbf{For hyperparameter tuning}: Optuna remains the better choice given its integration with ML frameworks and pruning capabilities.
+    \item \textbf{For multi-objective optimization}: PyMOO provides native support with algorithms like NSGA-II and NSGA-III.
+    \item \textbf{For distributed optimization}: Optuna's database-backed architecture facilitates easier scaling.
+\end{itemize}
+
+% ----------------------------------------------------------------------------
+% CONCLUSIONS
+% ----------------------------------------------------------------------------
+\section{Conclusions and Future Work}
+\label{sec:conclusions}
+
+This comparative study evaluated PyMOO and Optuna on standard benchmark optimization problems. Our key findings are:
+
+\begin{enumerate}
+    \item \textbf{Solution Quality}: PyMOO consistently outperformed Optuna across all benchmark functions, with differences of several orders of magnitude in final fitness values.
+    \item \textbf{Execution Time}: Optuna demonstrated faster execution times but at the cost of optimization precision.
+    \item \textbf{Convergence Behavior}: PyMOO algorithms showed smoother convergence patterns characteristic of evolutionary optimization.
+    \item \textbf{Use Case Alignment}: Each library excels in its intended domain---PyMOO for evolutionary optimization research and Optuna for hyperparameter tuning.
+\end{enumerate}
+
+\subsection{Open Problems and Future Directions}
+
+Several directions for future research emerge from this study:
+
+\begin{itemize}
+    \item \textbf{Constrained optimization}: Comparing constraint handling mechanisms between libraries
+    \item \textbf{High-dimensional problems}: Evaluating scalability to hundreds or thousands of dimensions
+    \item \textbf{Multi-objective optimization}: Conducting comprehensive Pareto front analysis
+    \item \textbf{Real-world applications}: Testing on practical engineering optimization problems
+    \item \textbf{Hybrid approaches}: Combining Optuna's efficient sampling with PyMOO's evolutionary operators
+\end{itemize}
+
+The source code for this comparative study is available for reproducibility, including Docker containerization for consistent execution environments.
+
+% ----------------------------------------------------------------------------
+% REFERENCES
+% ----------------------------------------------------------------------------
+\bibliographystyle{plainnat}
+\bibliography{references}
+
+\end{document}

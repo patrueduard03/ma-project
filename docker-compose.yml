@@ -1,0 +1,16 @@
+services:
+  # Run full optimization experiments
+  experiment:
+    build: .
+    container_name: pymoo-vs-optuna
+    volumes:
+      - ./report:/app/report
+    command: python main.py
+
+  # Run quick test only
+  quick-test:
+    build: .
+    container_name: pymoo-vs-optuna-quick
+    volumes:
+      - ./report:/app/report
+    command: python main.py --quick
