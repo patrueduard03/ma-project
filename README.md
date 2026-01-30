@@ -14,55 +14,51 @@ Our goal was to see if Optuna (made for Machine Learning) can beat PyMOO (made f
 
 ## How to Run It
 
-The easiest way is to use Docker so you don't have to install anything manually.
+### Option 1: Using Docker
 
-### Using Docker (Recommended)
+If you have Docker installed, this is the easiest way:
 
-1.  **Fast Test** (Runs in ~1 min):
-    ```bash
-    docker compose run --rm quick-test
-    ```
+```bash
+# Quick test (~1 min)
+docker compose run --rm quick-test
 
-2.  **Full Experiment** (Runs in ~5 mins):
-    ```bash
-    docker compose run --rm experiment
-    ```
+# Full experiment (~5 mins)
+docker compose run --rm experiment
+```
 
-This will run all the algorithms, save the results, and generate the plots in the `report/figures` folder.
+### Option 2: Running Locally (No Docker)
 
-### Manual Run (If you don't have Docker)
+If you don't have Docker, no problem. Just make sure you have Python 3.10 or newer.
 
-You need Python 3.10+ installed.
+```bash
+# First, create a virtual environment and activate it
+python3 -m venv venv
+source venv/bin/activate   # On Windows: venv\Scripts\activate
 
-1.  Install dependencies:
-    ```bash
-    pip install -r requirements.txt
-    ```
+# Install the dependencies
+pip install -r requirements.txt
 
-2.  Run the main script:
-    ```bash
-    python main.py
-    ```
+# Run a quick test to make sure everything works
+python main.py --quick
 
-## The Report & Presentation
+# Or run the full experiment
+python main.py
+```
 
-All the files you need for the final submission are in the `report/` folder:
+The script will print the results in the terminal and save figures to `report/figures/`.
 
-*   **`report/main.tex`**: The full LaTeX report. It automatically pulls in the figures we generate.
-*   **`report/presentation.tex`**: The 10-minute Beamer presentation slides.
-*   **`report/references.bib`**: The bibliography with all the papers we cited.
+You can also tweak the parameters if you want:
+```bash
+python main.py --pop-size 50 --generations 100 --runs 10
+```
 
-To view them, just upload the whole `report/` folder to Overleaf and hit Compile.
+## Project Structure
 
-## What's Inside?
-
-*   `main.py`: The script that runs everything.
-*   `src/`: The code for the algorithms and problems.
-*   `report/figures/`: Where the charts and tables go after you run the code.
+- `main.py` - Runs everything
+- `src/` - Algorithm implementations and benchmark problems
+- `report/figures/` - Generated charts and tables
 
 ---
 
-**Authors**:
-Metaheuristic Algorithms Team
-Master's in Computer Science
-West University of Timișoara
+**Authors**: Metaheuristic Algorithms Team  
+Master's in Computer Science, West University of Timișoara
