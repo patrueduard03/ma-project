@@ -1,11 +1,8 @@
 # Metaheuristic Algorithms Project: PyMOO vs Optuna
 
-**Course**: Metaheuristic Algorithms  
-**Year**: 2026
-
 ---
 
-## What is this?
+## What is project about?
 
 This is a comparative study of two optimization libraries: **PyMOO** and **Optuna**.
 We tested them to see which one is better for standard mathematical problems like Sphere, Rastrigin, Ackley, and Rosenbrock.
@@ -57,8 +54,3 @@ python main.py --pop-size 50 --generations 100 --runs 10
 - `main.py` - Runs everything
 - `src/` - Algorithm implementations and benchmark problems
 - `report/figures/` - Generated charts and tables
-
----
-
-**Authors**: Metaheuristic Algorithms Team  
-Master's in Computer Science, West University of Timișoara

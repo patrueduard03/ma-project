@@ -5,7 +5,6 @@ This module provides wrapper classes for Optuna optimization algorithms.
 Optuna is a hyperparameter optimization framework that provides various
 samplers for efficient optimization.
 
-Reference: https://optuna.readthedocs.io/
 """
 
 import numpy as np

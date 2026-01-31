@@ -1,6 +1,7 @@
 #!/bin/bash
-echo "1) Quick test"
-echo "2) Full experiment"
+echo "Please select an option:"
+echo "1. Quick test"
+echo "2. Full experiment"
 read -p "Choose [1/2]: " choice
 
 if [ "$choice" = "2" ]; then

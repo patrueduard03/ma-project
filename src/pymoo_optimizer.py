@@ -4,8 +4,6 @@ PyMOO Optimizer Module
 This module provides wrapper classes for PyMOO optimization algorithms.
 PyMOO is a multi-objective optimization framework that focuses on
 well-established algorithms with a clean, modular API.
-
-Reference: https://pymoo.org/
 """
 
 import numpy as np
