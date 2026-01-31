@@ -1,10 +1,4 @@
-"""
-PyMOO Optimizer Module
-
-This module provides wrapper classes for PyMOO optimization algorithms.
-PyMOO is a multi-objective optimization framework that focuses on
-well-established algorithms with a clean, modular API.
-"""
+"""PyMOO optimizer wrapper for GA, DE, and PSO algorithms."""
 
 import numpy as np
 import time
@@ -19,15 +13,9 @@ from pymoo.termination import get_termination
 
 
 class PymooProblem(Problem):
-    """Wrapper to convert our benchmark problems to PyMOO format."""
+    """Wrapper to convert benchmark problems to PyMOO format."""
 
     def __init__(self, benchmark_problem):
-        """
-        Initialize PyMOO problem wrapper.
-
-        Args:
-            benchmark_problem: Instance of BenchmarkProblem
-        """
         self.benchmark = benchmark_problem
         lb, ub = benchmark_problem.get_bounds()
 
@@ -40,47 +28,23 @@ class PymooProblem(Problem):
         )
 
     def _evaluate(self, x, out, *args, **kwargs):
-        """Evaluate objective function for population of solutions."""
+        """Evaluate objective for population."""
         out["F"] = np.array([self.benchmark.evaluate(xi) for xi in x])
 
 
 class PymooOptimizer:
-    """
-    Wrapper class for PyMOO optimization algorithms.
-
-    Provides a unified interface for running GA, DE, and PSO algorithms
-    with consistent parameter handling and result collection.
-    """
+    """Wrapper for PyMOO optimization algorithms."""
 
     def __init__(self, pop_size: int = 50, n_gen: int = 100, seed: int = None):
-        """
-        Initialize the optimizer.
-
-        Args:
-            pop_size: Population size
-            n_gen: Number of generations
-            seed: Random seed for reproducibility
-        """
         self.pop_size = pop_size
         self.n_gen = n_gen
         self.seed = seed
         self.history = []
 
     def _run_algorithm(self, algorithm, problem, verbose: bool = False) -> Dict[str, Any]:
-        """
-        Run an optimization algorithm and collect results.
-
-        Args:
-            algorithm: PyMOO algorithm instance
-            problem: PymooProblem instance
-            verbose: Whether to print progress
-
-        Returns:
-            Dictionary with optimization results
-        """
+        """Run algorithm and collect results."""
         termination = get_termination("n_gen", self.n_gen)
 
-        # Track convergence history
         history = []
 
         class HistoryCallback:
@@ -123,16 +87,7 @@ class PymooOptimizer:
         }
 
     def run_ga(self, benchmark_problem, verbose: bool = False) -> Dict[str, Any]:
-        """
-        Run Genetic Algorithm optimization.
-
-        Args:
-            benchmark_problem: BenchmarkProblem instance
-            verbose: Whether to print progress
-
-        Returns:
-            Optimization results dictionary
-        """
+        """Run Genetic Algorithm."""
         problem = PymooProblem(benchmark_problem)
 
         algorithm = GA(
@@ -143,16 +98,7 @@ class PymooOptimizer:
         return self._run_algorithm(algorithm, problem, verbose)
 
     def run_de(self, benchmark_problem, verbose: bool = False) -> Dict[str, Any]:
-        """
-        Run Differential Evolution optimization.
-
-        Args:
-            benchmark_problem: BenchmarkProblem instance
-            verbose: Whether to print progress
-
-        Returns:
-            Optimization results dictionary
-        """
+        """Run Differential Evolution."""
         problem = PymooProblem(benchmark_problem)
 
         algorithm = DE(
@@ -166,16 +112,7 @@ class PymooOptimizer:
         return self._run_algorithm(algorithm, problem, verbose)
 
     def run_pso(self, benchmark_problem, verbose: bool = False) -> Dict[str, Any]:
-        """
-        Run Particle Swarm Optimization.
-
-        Args:
-            benchmark_problem: BenchmarkProblem instance
-            verbose: Whether to print progress
-
-        Returns:
-            Optimization results dictionary
-        """
+        """Run Particle Swarm Optimization."""
         problem = PymooProblem(benchmark_problem)
 
         algorithm = PSO(
@@ -188,16 +125,7 @@ class PymooOptimizer:
         return self._run_algorithm(algorithm, problem, verbose)
 
     def run_all(self, benchmark_problem, verbose: bool = False) -> Dict[str, Dict[str, Any]]:
-        """
-        Run all available algorithms on a problem.
-
-        Args:
-            benchmark_problem: BenchmarkProblem instance
-            verbose: Whether to print progress
-
-        Returns:
-            Dictionary mapping algorithm names to results
-        """
+        """Run all algorithms on a problem."""
         return {
             "GA": self.run_ga(benchmark_problem, verbose),
             "DE": self.run_de(benchmark_problem, verbose),
@@ -206,7 +134,6 @@ class PymooOptimizer:
 
 
 if __name__ == "__main__":
-    # Test the PyMOO optimizer
     from problems import Sphere, Rastrigin
 
     optimizer = PymooOptimizer(pop_size=50, n_gen=100, seed=42)
@@ -214,7 +141,6 @@ if __name__ == "__main__":
     print("Testing PyMOO Optimizer")
     print("=" * 50)
 
-    # Test on Sphere function
     sphere = Sphere(n_dim=10)
     results = optimizer.run_all(sphere, verbose=False)
 
@@ -223,7 +149,6 @@ if __name__ == "__main__":
         print(f"  {algo_name}: Best = {result['best_fitness']:.6e}, "
               f"Time = {result['elapsed_time']:.3f}s")
 
-    # Test on Rastrigin function
     rastrigin = Rastrigin(n_dim=10)
     results = optimizer.run_all(rastrigin, verbose=False)
 

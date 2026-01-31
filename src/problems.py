@@ -1,32 +1,19 @@
-"""
-Benchmark Optimization Problems
-
-This module defines standard benchmark functions used for testing
-optimization algorithms. Each function has a known global minimum
-which allows for objective comparison of algorithm performance.
-"""
+"""Benchmark optimization problems for testing algorithms."""
 
 import numpy as np
 
 
 class BenchmarkProblem:
-    """Base class for benchmark optimization problems."""
+    """Base class for benchmark problems."""
 
     def __init__(self, n_dim: int = 10, bounds: tuple = None):
-        """
-        Initialize the benchmark problem.
-
-        Args:
-            n_dim: Number of dimensions
-            bounds: Tuple of (lower_bound, upper_bound)
-        """
         self.n_dim = n_dim
         self.bounds = bounds or (-5.12, 5.12)
         self.global_minimum = 0.0
         self.name = "Benchmark"
 
     def evaluate(self, x: np.ndarray) -> float:
-        """Evaluate the objective function at point x."""
+        """Evaluate objective function at point x."""
         raise NotImplementedError
 
     def get_bounds(self) -> tuple:
@@ -38,18 +25,8 @@ class BenchmarkProblem:
 
 class Sphere(BenchmarkProblem):
     """
-    Sphere Function (De Jong's Function 1)
-
-    f(x) = sum(x_i^2)
-
-    Global minimum: f(0,...,0) = 0
-    Search domain: [-5.12, 5.12]^n
-
-    Properties:
-    - Unimodal
-    - Convex
-    - Continuous
-    - Differentiable
+    Sphere function: f(x) = sum(x_i^2)
+    Global min at origin, unimodal and convex.
     """
 
     def __init__(self, n_dim: int = 10):
@@ -63,17 +40,8 @@ class Sphere(BenchmarkProblem):
 
 class Rastrigin(BenchmarkProblem):
     """
-    Rastrigin Function
-
-    f(x) = 10*n + sum(x_i^2 - 10*cos(2*pi*x_i))
-
-    Global minimum: f(0,...,0) = 0
-    Search domain: [-5.12, 5.12]^n
-
-    Properties:
-    - Highly multimodal
-    - Regularly distributed local minima
-    - Non-convex
+    Rastrigin function: highly multimodal with regular local minima.
+    Global min at origin.
     """
 
     def __init__(self, n_dim: int = 10):
@@ -88,18 +56,8 @@ class Rastrigin(BenchmarkProblem):
 
 class Ackley(BenchmarkProblem):
     """
-    Ackley Function
-
-    f(x) = -20*exp(-0.2*sqrt(1/n * sum(x_i^2)))
-           - exp(1/n * sum(cos(2*pi*x_i))) + 20 + e
-
-    Global minimum: f(0,...,0) = 0
-    Search domain: [-32.768, 32.768]^n
-
-    Properties:
-    - Multimodal
-    - Nearly flat outer region
-    - Large hole at center
+    Ackley function: multimodal with nearly flat outer region.
+    Global min at origin.
     """
 
     def __init__(self, n_dim: int = 10):
@@ -120,18 +78,8 @@ class Ackley(BenchmarkProblem):
 
 class Rosenbrock(BenchmarkProblem):
     """
-    Rosenbrock Function (Banana Function)
-
-    f(x) = sum(100*(x_{i+1} - x_i^2)^2 + (1 - x_i)^2)
-
-    Global minimum: f(1,...,1) = 0
-    Search domain: [-5, 10]^n
-
-    Properties:
-    - Unimodal (for n<=3)
-    - Valley-shaped
-    - Non-convex
-    - Difficult to optimize due to narrow valley
+    Rosenbrock (banana) function: valley-shaped, hard to optimize.
+    Global min at (1,...,1).
     """
 
     def __init__(self, n_dim: int = 10):
@@ -147,15 +95,7 @@ class Rosenbrock(BenchmarkProblem):
 
 
 def get_all_problems(n_dim: int = 10) -> dict:
-    """
-    Get all benchmark problems as a dictionary.
-
-    Args:
-        n_dim: Number of dimensions for each problem
-
-    Returns:
-        Dictionary mapping problem names to problem instances
-    """
+    """Get all benchmark problems."""
     return {
         "Sphere": Sphere(n_dim),
         "Rastrigin": Rastrigin(n_dim),
@@ -165,7 +105,7 @@ def get_all_problems(n_dim: int = 10) -> dict:
 
 
 if __name__ == "__main__":
-    # Test the benchmark functions
+    # Test benchmark functions
     problems = get_all_problems(n_dim=10)
 
     for name, problem in problems.items():

@@ -1,23 +1,15 @@
-"""
-Visualization Module
-
-This module provides plotting functions for visualizing comparison
-results between PyMOO and Optuna optimization libraries.
-"""
+"""Plotting functions for visualizing comparison results."""
 
 import numpy as np
 import matplotlib.pyplot as plt
 from typing import Dict, List, Any, Optional
 import os
 
-
-# Set style for professional-looking plots
 plt.style.use('seaborn-v0_8-whitegrid')
 
-# Color scheme
 COLORS = {
-    "PyMOO": "#2E86AB",    # Blue
-    "Optuna": "#E94F37",   # Red
+    "PyMOO": "#2E86AB",
+    "Optuna": "#E94F37",
 }
 
 
@@ -27,25 +19,14 @@ def plot_convergence(
     algorithm: str,
     save_path: Optional[str] = None
 ) -> plt.Figure:
-    """
-    Plot convergence curves for both libraries.
-
-    Args:
-        convergence_data: Dictionary with 'PyMOO' and 'Optuna' histories
-        problem_name: Name of the problem
-        algorithm: Algorithm name
-        save_path: Path to save the figure (optional)
-
-    Returns:
-        Matplotlib figure
-    """
+    """Plot convergence curves for both libraries."""
     fig, ax = plt.subplots(figsize=(10, 6))
 
     for library, histories in convergence_data.items():
         if not histories:
             continue
 
-        # Convert to numpy array, padding shorter histories
+        # Pad shorter histories to same length
         max_len = max(len(h) for h in histories)
         padded = np.zeros((len(histories), max_len))
 
@@ -88,17 +69,7 @@ def plot_comparison_bars(
     metric: str = "Best_Fitness_Mean",
     save_path: Optional[str] = None
 ) -> plt.Figure:
-    """
-    Create bar charts comparing performance metrics.
-
-    Args:
-        results_df: DataFrame with experiment results
-        metric: Column name for the metric to compare
-        save_path: Path to save the figure (optional)
-
-    Returns:
-        Matplotlib figure
-    """
+    """Create bar charts comparing performance metrics."""
     problems = results_df['Problem'].unique()
     algorithms = results_df['Algorithm'].unique()
 
@@ -141,7 +112,7 @@ def plot_comparison_bars(
         ax.legend()
         ax.set_yscale('log')
 
-        # Add value labels on bars
+        # Add value labels
         for bar in bars1:
             height = bar.get_height()
             ax.annotate(f'{height:.2e}',
@@ -171,16 +142,7 @@ def plot_time_comparison(
     results_df,
     save_path: Optional[str] = None
 ) -> plt.Figure:
-    """
-    Create a heatmap comparing execution times.
-
-    Args:
-        results_df: DataFrame with experiment results
-        save_path: Path to save the figure (optional)
-
-    Returns:
-        Matplotlib figure
-    """
+    """Create heatmap comparing execution times."""
     fig, axes = plt.subplots(1, 2, figsize=(14, 6))
 
     for ax, library in zip(axes, ['PyMOO', 'Optuna']):
@@ -224,17 +186,7 @@ def plot_overall_comparison(
     results_df,
     save_path: Optional[str] = None
 ) -> plt.Figure:
-    """
-    Create an overall comparison radar/spider chart.
-
-    Args:
-        results_df: DataFrame with experiment results
-        save_path: Path to save the figure (optional)
-
-    Returns:
-        Matplotlib figure
-    """
-    # Aggregate scores
+    """Create overall comparison bar chart."""
     pymoo_data = results_df[results_df['Library'] == 'PyMOO']
     optuna_data = results_df[results_df['Library'] == 'Optuna']
 
@@ -243,7 +195,6 @@ def plot_overall_comparison(
                   'Speed\n(lower time)',
                   'Best Result\n(lower min)']
 
-    # Normalize scores (lower is better for all)
     pymoo_scores = [
         pymoo_data['Best_Fitness_Mean'].mean(),
         pymoo_data['Best_Fitness_Std'].mean(),
@@ -287,39 +238,29 @@ def create_all_figures(
     convergence_data: Dict,
     output_dir: str = "report/figures"
 ) -> List[str]:
-    """
-    Generate all figures for the report.
-
-    Args:
-        results_df: DataFrame with experiment results
-        convergence_data: Dictionary with convergence histories
-        output_dir: Directory to save figures
-
-    Returns:
-        List of saved figure paths
-    """
+    """Generate all figures for the report."""
     os.makedirs(output_dir, exist_ok=True)
     saved_paths = []
 
-    # 1. Comparison bars
+    # Comparison bars
     path = os.path.join(output_dir, "comparison_bars.png")
     plot_comparison_bars(results_df, save_path=path)
     saved_paths.append(path)
     plt.close()
 
-    # 2. Time comparison
+    # Time comparison
     path = os.path.join(output_dir, "time_comparison.png")
     plot_time_comparison(results_df, save_path=path)
     saved_paths.append(path)
     plt.close()
 
-    # 3. Overall comparison
+    # Overall comparison
     path = os.path.join(output_dir, "overall_comparison.png")
     plot_overall_comparison(results_df, save_path=path)
     saved_paths.append(path)
     plt.close()
 
-    # 4. Convergence plots for each problem-algorithm combination
+    # Convergence plots
     for (problem, algorithm), data in convergence_data.items():
         path = os.path.join(output_dir, f"convergence_{problem.lower()}_{algorithm.lower()}.png")
         plot_convergence(data, problem, algorithm, save_path=path)
@@ -330,7 +271,6 @@ def create_all_figures(
 
 
 if __name__ == "__main__":
-    # Quick test with dummy data
     import pandas as pd
 
     test_data = {

@@ -1,12 +1,5 @@
 """
-Main Runner Script
-
-Comparative Study of PyMOO and Optuna
-Metaheuristic Algorithms Course Project 2026
-
-This script runs the complete comparison experiment between PyMOO and Optuna
-optimization libraries, generates results tables, and creates visualization
-plots for the report.
+Main runner for PyMOO vs Optuna comparison.
 """
 
 import os
@@ -17,10 +10,8 @@ import warnings
 import numpy as np
 import pandas as pd
 
-# Suppress warnings for cleaner output
 warnings.filterwarnings('ignore')
 
-# Add src to path
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from src.problems import get_all_problems
@@ -35,19 +26,7 @@ def run_full_experiment(
     n_dim: int = 10,
     output_dir: str = "report/figures"
 ) -> pd.DataFrame:
-    """
-    Run the complete comparison experiment.
-
-    Args:
-        pop_size: Population size
-        n_gen: Number of generations
-        n_runs: Number of independent runs
-        n_dim: Problem dimensionality
-        output_dir: Directory for output figures
-
-    Returns:
-        DataFrame with all results
-    """
+    """Run the full comparison experiment."""
     print("=" * 70)
     print("  Comparative Study: PyMOO vs Optuna")
     print("  Metaheuristic Algorithms Course Project 2025-2026")
@@ -60,18 +39,15 @@ def run_full_experiment(
     print(f"  - Problem Dimensions: {n_dim}")
     print(f"  - Output Directory: {output_dir}")
 
-    # Get benchmark problems
     problems = get_all_problems(n_dim=n_dim)
     print(f"\nBenchmark Problems: {list(problems.keys())}")
 
-    # Initialize comparison runner
     runner = ComparisonRunner(
         pop_size=pop_size,
         n_gen=n_gen,
         n_runs=n_runs
     )
 
-    # Run experiments
     print("\n" + "-" * 70)
     print("Running Optimization Experiments...")
     print("-" * 70)
@@ -82,13 +58,11 @@ def run_full_experiment(
         verbose=True
     )
 
-    # Display results
     print("\n" + "=" * 70)
     print("  RESULTS SUMMARY")
     print("=" * 70)
     print(format_results_table(results_df))
 
-    # Generate figures
     print("\n" + "-" * 70)
     print("Generating Visualization Figures...")
     print("-" * 70)
@@ -103,12 +77,10 @@ def run_full_experiment(
     for fig_path in saved_figures:
         print(f"  - {fig_path}")
 
-    # Save results to CSV
     csv_path = os.path.join(output_dir, "results.csv")
     results_df.to_csv(csv_path, index=False)
     print(f"\nResults saved to: {csv_path}")
 
-    # Generate LaTeX table
     latex_table = generate_latex_table(results_df)
     latex_path = os.path.join(output_dir, "results_table.tex")
     with open(latex_path, 'w') as f:
@@ -123,15 +95,7 @@ def run_full_experiment(
 
 
 def generate_latex_table(df: pd.DataFrame) -> str:
-    """
-    Generate a LaTeX table from results DataFrame.
-
-    Args:
-        df: Results DataFrame
-
-    Returns:
-        LaTeX table string
-    """
+    """Generate LaTeX table from results."""
     latex = r"""\begin{table}[htbp]
 \centering
 \caption{Comparative Results: PyMOO vs Optuna}
@@ -158,7 +122,7 @@ def generate_latex_table(df: pd.DataFrame) -> str:
 
 
 def run_quick_test():
-    """Run a quick test with reduced parameters."""
+    """Quick test with reduced parameters."""
     print("Running Quick Test (reduced parameters)...")
 
     from src.problems import Sphere, Rastrigin

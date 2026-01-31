@@ -1,9 +1,4 @@
-"""
-Comparison Utilities Module
-
-This module provides utilities for running comparison experiments
-between PyMOO and Optuna optimization libraries.
-"""
+"""Utilities for running comparison experiments between PyMOO and Optuna."""
 
 import numpy as np
 import pandas as pd
@@ -16,22 +11,9 @@ from src.optuna_optimizer import OptunaOptimizer
 
 
 class ComparisonRunner:
-    """
-    Runs comparison experiments between PyMOO and Optuna.
-
-    Executes multiple runs of various algorithms on benchmark problems
-    and collects statistical results.
-    """
+    """Runs comparison experiments between PyMOO and Optuna."""
 
     def __init__(self, pop_size: int = 50, n_gen: int = 100, n_runs: int = 10):
-        """
-        Initialize the comparison runner.
-
-        Args:
-            pop_size: Population size for all algorithms
-            n_gen: Number of generations
-            n_runs: Number of independent runs for statistical analysis
-        """
         self.pop_size = pop_size
         self.n_gen = n_gen
         self.n_runs = n_runs
@@ -43,17 +25,7 @@ class ComparisonRunner:
         algorithm: str,
         seed: int = None
     ) -> Dict[str, Dict[str, Any]]:
-        """
-        Run a single comparison between PyMOO and Optuna.
-
-        Args:
-            problem: BenchmarkProblem instance
-            algorithm: Algorithm name ('GA', 'DE', or 'PSO')
-            seed: Random seed
-
-        Returns:
-            Dictionary with results from both libraries
-        """
+        """Run single comparison between both libraries."""
         pymoo_opt = PymooOptimizer(self.pop_size, self.n_gen, seed)
         optuna_opt = OptunaOptimizer(self.pop_size, self.n_gen, seed)
 
@@ -73,17 +45,7 @@ class ComparisonRunner:
         algorithms: List[str] = None,
         verbose: bool = True
     ) -> pd.DataFrame:
-        """
-        Run a full comparison experiment with multiple runs.
-
-        Args:
-            problems: Dictionary of problems to test (default: all)
-            algorithms: List of algorithms to use (default: ['GA', 'DE', 'PSO'])
-            verbose: Whether to print progress
-
-        Returns:
-            DataFrame with experiment results
-        """
+        """Run full experiment with multiple runs for statistical analysis."""
         if problems is None:
             problems = get_all_problems(n_dim=10)
 
@@ -149,7 +111,7 @@ class ComparisonRunner:
                     "Global_Minimum": problem.global_minimum
                 })
 
-                # Store convergence histories for later visualization
+                # Save histories for visualization
                 self.results[(prob_name, algo)] = {
                     "PyMOO": pymoo_histories,
                     "Optuna": optuna_histories
@@ -161,15 +123,7 @@ class ComparisonRunner:
         return pd.DataFrame(all_results)
 
     def generate_summary_table(self, df: pd.DataFrame) -> pd.DataFrame:
-        """
-        Generate a summary comparison table.
-
-        Args:
-            df: DataFrame from run_experiment
-
-        Returns:
-            Pivot table comparing libraries across problems and algorithms
-        """
+        """Generate pivot table summary."""
         summary = df.pivot_table(
             index=['Problem', 'Algorithm'],
             columns='Library',
@@ -184,16 +138,7 @@ class ComparisonRunner:
         problem_name: str,
         algorithm: str
     ) -> Dict[str, List[List[float]]]:
-        """
-        Get convergence history data for visualization.
-
-        Args:
-            problem_name: Name of the problem
-            algorithm: Algorithm name
-
-        Returns:
-            Dictionary with convergence histories for both libraries
-        """
+        """Get convergence history for visualization."""
         key = (problem_name, algorithm)
         if key in self.results:
             return self.results[key]
@@ -201,15 +146,7 @@ class ComparisonRunner:
 
 
 def format_results_table(df: pd.DataFrame) -> str:
-    """
-    Format results DataFrame as a nice table string.
-
-    Args:
-        df: Results DataFrame
-
-    Returns:
-        Formatted table string
-    """
+    """Format results as a table string."""
     from tabulate import tabulate
 
     table_data = []
@@ -227,13 +164,12 @@ def format_results_table(df: pd.DataFrame) -> str:
 
 
 if __name__ == "__main__":
-    # Run a quick comparison test
+    # Quick comparison test
     print("Running Comparison Test")
     print("=" * 60)
 
     runner = ComparisonRunner(pop_size=30, n_gen=50, n_runs=3)
 
-    # Use only Sphere for quick test
     from src.problems import Sphere
     test_problems = {"Sphere": Sphere(n_dim=10)}
 
