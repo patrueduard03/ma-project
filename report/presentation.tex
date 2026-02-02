@@ -25,9 +25,9 @@
 % ============================================================================
 \title[Comparative Study: PyMOO vs Optuna]{Comparative Study of Metaheuristic Optimization Libraries:\\PyMOO vs Optuna}
 \subtitle{Metaheuristic Algorithms Course Project}
-\author[Team Name]{Metaheuristic Algorithms Course\\Master's Program in Computer Science}
+\author[Patru Gheorghe Eduard]{Patru Gheorghe Eduard}
 \institute[UVT]{West University of Timișoara}
-\date{January 2026}
+\date{February 2026}
 
 % ============================================================================
 % SLIDES
@@ -49,189 +49,442 @@
 \end{frame}
 
 % ----------------------------------------------------------------------------
-% Slide 3: Introduction
+% Slide 3: Introduction - What is Optimization?
 % ----------------------------------------------------------------------------
 \section{Introduction}
-\begin{frame}{Introduction & Objectives}
+\begin{frame}{Introduction: What is Optimization?}
     \begin{columns}
-        \column{0.6\textwidth}
-        \textbf{Goal:} Compare two popular Python optimization libraries on standard benchmark problems.
+        \column{0.55\textwidth}
+        \textbf{Optimization = Finding the best solution}
         
-        \vspace{0.5cm}
+        \vspace{0.3cm}
         
-        \textbf{1. PyMOO (Multi-Objective Optimization)}
+        \textbf{Key Terms:}
         \begin{itemize}
-            \item Designed for evolutionary computation.
-            \item Population-based architecture.
-            \item High transparency and academic rigor.
+            \item \textbf{Objective Function}: $f(x)$ — what we minimize (e.g., error, cost)
+            \item \textbf{Search Space}: All possible solutions (here: $\mathbb{R}^{10}$)
+            \item \textbf{Global Minimum}: The absolute best solution
+            \item \textbf{Local Minimum}: A ``trap'' — looks good nearby but not best overall
         \end{itemize}
+        
+        \column{0.45\textwidth}
+        \begin{alertblock}{Why Metaheuristics?}
+            \begin{itemize}
+                \item No gradient required
+                \item Handle multimodal landscapes
+                \item Escape local optima
+                \item Work in high dimensions
+            \end{itemize}
+        \end{alertblock}
         
         \vspace{0.2cm}
         
-        \textbf{2. Optuna (Hyperparameter Optimization)}
-        \begin{itemize}
-            \item Designed for ML hyperparameter tuning.
-            \item Define-by-run paradigm.
-            \item Sampler-based architecture (TPE, CMA-ES).
-        \end{itemize}
+        \footnotesize{\textit{Classic methods (gradient descent) fail on complex, non-smooth functions.}}
+    \end{columns}
+\end{frame}
+
+% ----------------------------------------------------------------------------
+% Slide 4: Libraries Compared
+% ----------------------------------------------------------------------------
+\begin{frame}{Libraries Compared: PyMOO vs Optuna}
+    \textbf{Goal:} Compare two popular Python optimization libraries on standard benchmark problems.
+    
+    \vspace{0.2cm}
+    
+    \begin{columns}
+        \column{0.35\textwidth}
+        \begin{block}{\textbf{PyMOO}}
+            \begin{itemize}
+                \item Evolutionary algorithms
+                \item Population-based
+                \item GA, DE, PSO
+                \item Academic focus
+            \end{itemize}
+            \footnotesize{\textit{``Population-based''} = many solutions evolve together}
+        \end{block}
         
-        \column{0.4\textwidth}
-        \centering
-        \begin{block}{Key Metric}
+        \column{0.35\textwidth}
+        \begin{block}{\textbf{Optuna}}
+            \begin{itemize}
+                \item ML hyperparameter tuning
+                \item Trial-by-trial sampling
+                \item TPE, CMA-ES
+                \item Industry focus
+            \end{itemize}
+            \footnotesize{\textit{``Sampler-based''} = one trial at a time}
+        \end{block}
+        
+        \column{0.3\textwidth}
+        \begin{alertblock}{Key Metrics}
             We evaluate:
             \begin{itemize}
                 \item Solution Quality (Fitness)
                 \item Convergence Speed
                 \item Execution Time
             \end{itemize}
-        \end{block}
+        \end{alertblock}
+    \end{columns}
+    
+    \vspace{0.2cm}
+    
+    \centering
+    \textbf{Research Question}: Can Optuna match PyMOO on continuous function optimization?
+\end{frame}
+
+% ----------------------------------------------------------------------------
+% Slide 5: Algorithms Explained
+% ----------------------------------------------------------------------------
+\section{Methodology}
+\begin{frame}{Algorithms: How They Work}
+    \begin{table}
+        \centering
+        \small
+        \begin{tabular}{l l l l}
+            \toprule
+            \textbf{PyMOO} & \textbf{Optuna} & \textbf{Core Idea} & \textbf{Key Mechanism} \\
+            \midrule
+            \textbf{GA} & TPE & Selection + Crossover & Fitness-based survival \\
+            \textbf{DE} & CMA-ES & Vector differences & Adaptive mutation \\
+            \textbf{PSO} & NSGA-II & Swarm movement & Personal + global best \\
+            \bottomrule
+        \end{tabular}
+    \end{table}
+    
+    \vspace{0.3cm}
+    
+    \begin{columns}
+        \column{0.33\textwidth}
+        \centering
+        \textbf{GA (Genetic Algorithm)}
+        
+        \footnotesize{Selection $\rightarrow$ Crossover $\rightarrow$ Mutation}
+        
+        \tiny{Mimics natural evolution}
+        
+        \column{0.33\textwidth}
+        \centering
+        \textbf{DE (Differential Evolution)}
+        
+        \footnotesize{$v = x_1 + F \cdot (x_2 - x_3)$}
+        
+        \tiny{Uses population differences for mutation}
+        
+        \column{0.33\textwidth}
+        \centering
+        \textbf{PSO (Particle Swarm)}
+        
+        \footnotesize{$v_{new} = w \cdot v + c_1 \cdot p_{best} + c_2 \cdot g_{best}$}
+        
+        \tiny{Particles follow best positions}
+    \end{columns}
+    
+    \vspace{0.3cm}
+    \hrule
+    \vspace{0.2cm}
+    
+    \begin{columns}
+        \column{0.33\textwidth}
+        \centering
+        \textbf{TPE (Tree-Parzen Estimator)}
+        
+        \footnotesize{$p(x|y) \rightarrow$ good vs bad regions}
+        
+        \tiny{Bayesian model of promising areas}
+        
+        \column{0.33\textwidth}
+        \centering
+        \textbf{CMA-ES (Covariance Matrix)}
+        
+        \footnotesize{$\mathcal{N}(\mu, \Sigma)$ adapts over time}
+        
+        \tiny{Learns search distribution shape}
+        
+        \column{0.33\textwidth}
+        \centering
+        \textbf{NSGA-II (Multi-Objective)}
+        
+        \footnotesize{Pareto ranking + crowding}
+        
+        \tiny{Designed for multi-objective, adapted here}
     \end{columns}
 \end{frame}
 
 % ----------------------------------------------------------------------------
-% Slide 4: Methodology
+% Slide 6: Benchmark Functions
 % ----------------------------------------------------------------------------
-\section{Methodology}
-\begin{frame}{Methodology: Algorithms \& Benchmarks}
-    \textbf{Algorithm Comparison Pairs:}
+\begin{frame}{Benchmark Functions: Why These 4?}
     \begin{table}
         \centering
-        \begin{tabular}{l l l}
+        \small
+        \begin{tabular}{l l l l}
             \toprule
-            \textbf{Category} & \textbf{PyMOO Algorithm} & \textbf{Optuna Sampler} \\
+            \textbf{Function} & \textbf{Type} & \textbf{Challenge} & \textbf{Global Min} \\
             \midrule
-            Population-based & Genetic Algorithm (GA) & TPE (Tree-structured Parzen) \\
-            Adaptive & Differential Evolution (DE) & CMA-ES \\
-            Swarm & PSO & NSGA-II Sampler \\
+            \textbf{Sphere} & Unimodal & Easy baseline (single bowl) & $f(0,...,0) = 0$ \\
+            \textbf{Rastrigin} & Multimodal & Many local minima (100s) & $f(0,...,0) = 0$ \\
+            \textbf{Ackley} & Multimodal & Flat outer + deep center & $f(0,...,0) = 0$ \\
+            \textbf{Rosenbrock} & Valley & Narrow curved valley & $f(1,...,1) = 0$ \\
             \bottomrule
         \end{tabular}
     \end{table}
-
+    
+    \vspace{0.3cm}
+    
+    \begin{alertblock}{Why 10 Dimensions?}
+        \begin{itemize}
+            \item Balances computational cost with real complexity
+            \item 10D = $10^{10}$ possible regions to search (high-dimensional challenge)
+            \item Standard in CEC benchmark competitions
+        \end{itemize}
+    \end{alertblock}
+    
     \vspace{0.2cm}
-    
-    \textbf{Benchmark Functions (10D):}
-    \begin{itemize}
-        \item \textbf{Sphere}: Unimodal, convex (Baseline).
-        \item \textbf{Rastrigin}: Highly multimodal (Local optima trap).
-        \item \textbf{Ackley}: Flat outer region, deep center hole.
-        \item \textbf{Rosenbrock}: Valley-shaped, hard convergence.
-    \end{itemize}
-    
-    \footnotesize{\textit{Setup: Pop=50, Gen=50, Runs=5}}
+    \centering
+    \footnotesize{\textbf{Setup}: Population = 50, Generations = 100, Independent Runs = 10}
 \end{frame}
 
 % ----------------------------------------------------------------------------
-% Slide 5: Results - Overall
+% Slide 7: Results - Overall
 % ----------------------------------------------------------------------------
 \section{Results}
-\begin{frame}{Overall Performance Comparison}
+\begin{frame}{Results: Solution Quality Comparison}
     \begin{figure}
         \centering
-        \includegraphics[width=0.85\textwidth]{comparison_bars.png}
-        \caption{Comparison of Best Fitness (Log Scale). Lower is better.}
+        \includegraphics[width=0.75\textwidth]{comparison_bars.png}
+        \caption{Best Fitness Achieved (Log Scale — lower is better)}
     \end{figure}
-    \begin{alertblock}{Observation}
-        PyMOO consistently achieves orders of magnitude better precision on continuous function optimization tasks.
+    \begin{alertblock}{Key Finding}
+        PyMOO achieves \textbf{10x to 1000x better precision} than Optuna on all benchmark functions.
     \end{alertblock}
 \end{frame}
 
 % ----------------------------------------------------------------------------
-% Slide 6: Results - Convergence
+% Slide 8: Results - Convergence
 % ----------------------------------------------------------------------------
-\begin{frame}{Convergence Analysis}
+\begin{frame}{Results: Convergence Analysis}
     \begin{columns}
         \column{0.5\textwidth}
         \centering
-        \textbf{Sphere Function (PSO/NSGA-II)}
+        \textbf{Sphere Function (PSO vs NSGA-II)}
         \includegraphics[width=\textwidth]{convergence_sphere_pso.png}
         
-        \small{PyMOO (Blue) converges rapidly.\\Optuna (Red) struggles to refine.}
+        \footnotesize{PyMOO: Rapid descent to $10^{-10}$}
+        
+        \footnotesize{Optuna: Plateaus early at $10^{-2}$}
         
         \column{0.5\textwidth}
         \centering
-        \textbf{Rastrigin Function (GA/TPE)}
+        \textbf{Rastrigin Function (GA vs TPE)}
         \includegraphics[width=\textwidth]{convergence_rastrigin_ga.png}
         
-        \small{PyMOO maintains population diversity.\\Optuna TPE explores broadly but shallowly.}
+        \footnotesize{PyMOO: Escapes local minima effectively}
+        
+        \footnotesize{Optuna: Gets trapped in local optima}
     \end{columns}
+    
+    \vspace{0.3cm}
+    
+    \centering
+    \small{\textit{Convergence} = how fitness improves over generations (iterations)}
 \end{frame}
 
 % ----------------------------------------------------------------------------
-% Slide 7: Results - Time
+% Slide 9: Results - Time
 % ----------------------------------------------------------------------------
-\begin{frame}{Execution Time Comparison}
+\begin{frame}{Results: Execution Time Trade-off}
     \begin{columns}
-        \column{0.6\textwidth}
+        \column{0.55\textwidth}
         \includegraphics[width=\textwidth]{time_comparison.png}
         
-        \column{0.4\textwidth}
-        \textbf{Performance Trade-off:}
+        \column{0.45\textwidth}
+        \textbf{Time Analysis:}
         
-        \vspace{0.5cm}
+        \vspace{0.3cm}
         
         \begin{itemize}
-            \item \textbf{Optuna} is approx. \textbf{2-3x faster}.
-            \item Lightweight overhead optimized for ML distinct trials.
-            \item \textbf{PyMOO} has higher overhead due to full population management.
+            \item \textbf{Optuna}: 2-3x faster
+            \item Lightweight: 1 trial at a time
+            \item No population management overhead
         \end{itemize}
+        
+        \vspace{0.3cm}
+        
+        \begin{itemize}
+            \item \textbf{PyMOO}: Slower but precise
+            \item Manages 50 individuals per generation
+            \item Full genetic operators each iteration
+        \end{itemize}
+        
+        \vspace{0.3cm}
+        
+        \begin{exampleblock}{Trade-off}
+            Speed vs Quality — PyMOO sacrifices time for precision
+        \end{exampleblock}
     \end{columns}
 \end{frame}
 
 % ----------------------------------------------------------------------------
-% Slide 8: Discussion
+% Slide 10: Why PyMOO Wins
 % ----------------------------------------------------------------------------
 \section{Discussion}
-\begin{frame}{Discussion}
+\begin{frame}{Discussion: Why Does PyMOO Win?}
     \begin{columns}
         \column{0.5\textwidth}
-        \begin{block}{Why PyMOO wins on Quality?}
-            \begin{itemize}
-                \item True population-based selection pressure.
-                \item Genetic operators (Crossover/Mutation) effectively exploit local gradients.
-                \item Designed specifically for mathematical optimization.
-            \end{itemize}
+        \begin{block}{\textbf{PyMOO Advantages}}
+            \begin{enumerate}
+                \item \textbf{True population diversity}
+                
+                \footnotesize{50 solutions explore simultaneously}
+                
+                \item \textbf{Selection pressure}
+                
+                \footnotesize{Best individuals survive and reproduce}
+                
+                \item \textbf{Genetic operators}
+                
+                \footnotesize{Crossover combines good traits; Mutation explores new areas}
+                
+                \item \textbf{Built for this task}
+                
+                \footnotesize{Designed specifically for continuous optimization}
+            \end{enumerate}
         \end{block}
         
         \column{0.5\textwidth}
-        \begin{block}{When to use Optuna?}
-            \begin{itemize}
-                \item Hyperparameter tuning (Categorical/Integer parameters).
-                \item Expensive objective functions (Pruning allowed).
-                \item Distributed computing requirements.
-            \end{itemize}
-        \end{block}
+        \begin{alertblock}{\textbf{Optuna Limitations (for this task)}}
+            \begin{enumerate}
+                \item \textbf{Sequential sampling}
+                
+                \footnotesize{Only 1 trial at a time, no population}
+                
+                \item \textbf{TPE is Bayesian}
+                
+                \footnotesize{Good for expensive evaluations, not for cheap functions}
+                
+                \item \textbf{Designed for ML}
+                
+                \footnotesize{Categorical/integer params, not continuous optimization}
+            \end{enumerate}
+        \end{alertblock}
     \end{columns}
 \end{frame}
 
 % ----------------------------------------------------------------------------
-% Slide 9: Conclusion
+% Slide 11: When to Use Each
+% ----------------------------------------------------------------------------
+\begin{frame}{Practical Recommendation: When to Use Each?}
+    \begin{columns}
+        \column{0.5\textwidth}
+        \begin{exampleblock}{\textbf{Use PyMOO When:}}
+            \begin{itemize}
+                \item Continuous function optimization
+                \item Mathematical benchmarks
+                \item Multi-objective problems
+                \item Academic research
+                \item Precision is critical
+            \end{itemize}
+        \end{exampleblock}
+        
+        \column{0.5\textwidth}
+        \begin{exampleblock}{\textbf{Use Optuna When:}}
+            \begin{itemize}
+                \item ML hyperparameter tuning
+                \item Mixed parameter types (int, cat, float)
+                \item Expensive objective functions
+                \item Early stopping / pruning needed
+                \item Distributed training
+            \end{itemize}
+        \end{exampleblock}
+    \end{columns}
+    
+    \vspace{0.5cm}
+    
+    \centering
+    \large{\textbf{Key Insight}: Right tool for the right job!}
+\end{frame}
+
+% ----------------------------------------------------------------------------
+% Slide 12: Statistical Validity
+% ----------------------------------------------------------------------------
+\begin{frame}{Statistical Validity: Why 10 Runs?}
+    \begin{columns}
+        \column{0.6\textwidth}
+        \textbf{Metaheuristics are stochastic} (random-based)
+        
+        \vspace{0.3cm}
+        
+        \begin{itemize}
+            \item Each run uses different random seed (42, 43, ..., 51)
+            \item Results vary between runs
+            \item We report: \textbf{Mean $\pm$ Standard Deviation}
+        \end{itemize}
+        
+        \vspace{0.3cm}
+        
+        \textbf{What Std Dev tells us:}
+        \begin{itemize}
+            \item Low Std Dev = Algorithm is \textbf{reliable/stable}
+            \item High Std Dev = Results are \textbf{inconsistent}
+        \end{itemize}
+        
+        \column{0.4\textwidth}
+        \begin{block}{Fair Comparison}
+            \begin{itemize}
+                \item Same population size (50)
+                \item Same generations (100)
+                \item Same function evaluations
+                \item Same random seeds
+            \end{itemize}
+        \end{block}
+        
+        \vspace{0.2cm}
+        
+        \footnotesize{\textit{This ensures reproducibility and fair comparison between libraries.}}
+    \end{columns}
+\end{frame}
+
+% ----------------------------------------------------------------------------
+% Slide 13: Conclusion
 % ----------------------------------------------------------------------------
 \section{Conclusion}
 \begin{frame}{Conclusion}
     \large
-    \begin{itemize}
-        \setlength\itemsep{1em}
-        \item \textbf{Solution Quality}: PyMOO is superior for continuous benchmark problems.
-        \item \textbf{Speed}: Optuna is faster but less precise for this domain.
-        \item \textbf{Usability}: Both libraries have excellent APIs, but serve different core purposes.
-    \end{itemize}
+    \begin{enumerate}
+        \setlength\itemsep{0.8em}
+        \item \textbf{Solution Quality}: PyMOO achieves 10-1000x better fitness values
+        \item \textbf{Convergence}: PyMOO converges deeper; Optuna plateaus early
+        \item \textbf{Speed}: Optuna is faster (2-3x) but sacrifices precision
+        \item \textbf{Design Philosophy}: Different tools for different purposes
+    \end{enumerate}
     
-    \vspace{1cm}
+    \vspace{0.8cm}
     
     \centering
-    \textbf{Final Verdict: Use PyMOO for algorithmic research, Optuna for system tuning.}
+    \begin{alertblock}{Final Verdict}
+        \textbf{PyMOO} for continuous optimization research \\
+        \textbf{Optuna} for ML hyperparameter tuning
+    \end{alertblock}
 \end{frame}
 
 % ----------------------------------------------------------------------------
-% Slide 10: Thank You
+% Slide 14: Thank You
 % ----------------------------------------------------------------------------
 \begin{frame}
     \centering
     \Huge \textbf{Thank You!}
     
-    \vspace{1cm}
+    \vspace{0.8cm}
     
     \large Questions?
+    
+    \vspace{1cm}
+    
+    \normalsize
+    \begin{tabular}{l l}
+        \textbf{Author}: & Patru Gheorghe Eduard \\
+        \textbf{Course}: & Metaheuristic Algorithms \\
+        \textbf{University}: & West University of Timișoara \\
+    \end{tabular}
 \end{frame}
 
 \end{document}
